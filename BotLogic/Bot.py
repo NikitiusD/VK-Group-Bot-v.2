@@ -42,5 +42,3 @@ class Bot:
             print(response)
             publish_timestamp += time_interval * 60
             sleep(0.33)
-
-

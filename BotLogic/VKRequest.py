@@ -20,3 +20,7 @@ class VKRequest:
     def get(self, method_name, parameters):
         return requests.get(self.get_url(method_name, self.combine_params(parameters))).json()
 
+    def post(self, method_name, parameters):
+        return requests.post(self.get_url(method_name, self.combine_params(parameters))).json()
+
+

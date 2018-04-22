@@ -18,8 +18,9 @@ class Bot:
 
     def get_top_posts(self):
         top_posts = []
+        # group = Group('158155713')
         for id in self.public_ids:
             group = Group(id)
             top_posts.append(group.top_post)
+        top_posts = [post for post in top_posts if post is not None]
         return top_posts
-

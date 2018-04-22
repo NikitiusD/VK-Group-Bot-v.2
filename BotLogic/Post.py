@@ -1,6 +1,9 @@
+from datetime import datetime
+
+
 class Post:
-    def __init__(self, date, likes, reposts, text, attachments):
-        self.date = date
+    def __init__(self, timestamp, likes, reposts, text, attachments):
+        self.date = self.eject_date(timestamp)
         self.likes = likes
         self.reposts = reposts
         self.attachments = attachments
@@ -13,6 +16,13 @@ class Post:
                f'Attachments: {len(self.attachments)}, Photos: {len(self.photos)}, Text: "{self.text}", ' \
                f'Suitable: {self.suitable}.'
 
+    def __eq__(self, other):
+        if isinstance(other, Post):
+            return self.date == other.date and self.likes == other.likes and self.reposts == other.reposts \
+               and self.attachments == other.attachments and self.photos == other.photos \
+               and self.text == other.text and self.suitable == other.suitable
+        return False
+
     def eject_photos(self):
         if self.attachments == []:
             return []
@@ -20,3 +30,6 @@ class Post:
 
     def check_the_suitability(self):
         return len(self.attachments) == len(self.photos)
+
+    def eject_date(self, timestamp):
+        return datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d')

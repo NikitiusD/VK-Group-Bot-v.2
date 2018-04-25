@@ -12,6 +12,10 @@ class Group:
         self.top_post = self.choose_top_post()
 
     def get_all_posts(self):
+        """
+        Gets information about the last 100 posts of a group and converts them to a list of instances of the Post class
+        :return: list of group posts
+        """
         method_name = 'wall.get'
         parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
         response = req().get(method_name, parameters)
@@ -20,6 +24,10 @@ class Group:
         return posts
 
     def get_yesterday_posts(self):
+        """
+        Selects yesterday's posts from all posts
+        :return: list of yesterday group posts
+        """
         today = date.today().strftime('%Y-%m-%d')
         yesterday = date(int(today.split('-')[0]), int(today.split('-')[1]), int(today.split('-')[2]) - 1)\
             .strftime('%Y-%m-%d')
@@ -27,6 +35,10 @@ class Group:
         return yesterday_posts
 
     def choose_top_post(self):
+        """
+        Choose the post with the highest number of likes
+        :return: post
+        """
         likes_max = 0
         top_post = 0
         for post in self.yesterday_posts:
@@ -39,10 +51,16 @@ class Group:
 
     @staticmethod
     def get_ids_from_urls(urls):
+        """
+        Gets ids of groups from it's short names
+        :param urls: list of (screen_name)s from VK API aka short names
+        :return: list of ids
+        """
         method_name = 'groups.getById'
         for i, url in enumerate(urls):
             if len(url) > 5 and url[:6] == 'public':
                 urls[i] = urls[i][6:]
         parameters = {'group_ids': ','.join(urls)}
         response = req().get(method_name, parameters)
-        return [info['id'] for info in response['response']]
+        ids = [info['id'] for info in response['response']]
+        return ids

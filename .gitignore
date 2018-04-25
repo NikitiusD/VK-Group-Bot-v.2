@@ -1,6 +1,7 @@
 # My ignores
 .idea/
 access_token.txt
+log_*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

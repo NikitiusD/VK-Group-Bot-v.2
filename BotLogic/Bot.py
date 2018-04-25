@@ -2,6 +2,9 @@ from BotLogic.VKRequest import VKRequest as req
 from BotLogic.Group import Group
 from BotLogic.Post import Post
 from time import sleep
+from datetime import date
+import json
+import os
 
 
 class Bot:
@@ -9,10 +12,12 @@ class Bot:
         with open('..\Information\meme_force_id.txt') as group_id:
             self.my_group_id = group_id.read()
         self.group_ids = self.get_group_ids()
+        self.group_names = self.get_group_names()
         self.members_count = self.get_members_count()
         self.top_posts = self.get_top_posts()
         self.selected_posts = self.select_top_posts()
         self.post_in_group()
+        self.log_posts()
 
     def get_group_ids(self):
         """
@@ -22,9 +27,20 @@ class Bot:
         method_name = 'groups.getById'
         parameters = {'group_id': self.my_group_id, 'fields': 'links'}
         response = req().get(method_name, parameters)
-        short_names = [info['url'].split('/')[3] for info in response['response'][0]['links']]
+        short_names = [group_info['url'].split('/')[3] for group_info in response['response'][0]['links']]
         ids = Group.get_ids_from_urls(short_names)
         return ids
+
+    def get_group_names(self):
+        """
+        Gets names of all groups
+        :return: list of names
+        """
+        method_name = 'groups.getById'
+        parameters = {'group_ids': ','.join([str(id) for id in self.group_ids])}
+        response = req().get(method_name, parameters)
+        names = [group_info['name'] for group_info in response['response']]
+        return names
 
     def get_members_count(self):
         """
@@ -42,7 +58,8 @@ class Bot:
         Gets the list of top posts, one post from each group
         :return: list of top suitable posts
         """
-        top_posts = [Group(id, members_count).top_post for id, members_count in zip(self.group_ids, self.members_count)]
+        top_posts = [Group(id, name, members_count).top_post
+                     for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
         top_posts = [post for post in top_posts if post is not None and post.suitable]
         return top_posts
 
@@ -51,7 +68,7 @@ class Bot:
         Selects best posts by sorting all posts by its conversion
         :return: list of 25 top posts
         """
-        sorted_posts = sorted(self.top_posts, key=lambda x: x.conversion, reverse=True)
+        sorted_posts = sorted(self.top_posts, key=lambda x: x.like_conversion, reverse=True)
         return sorted_posts[:25]
 
     def post_in_group(self):
@@ -72,3 +89,18 @@ class Bot:
             print(response)
             publish_timestamp += time_interval * 60
             sleep(0.33)
+        pass
+
+    def log_posts(self):
+        """
+        Logs all posted posts
+        """
+        try:
+            os.mkdir('..\logs', 777)
+        except OSError:
+            pass
+        json_log = json.dumps([post.__dict__ for post in self.selected_posts], indent=4, ensure_ascii=False)
+        today = date.today().strftime('%Y-%m-%d')
+        with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
+            file.write(json_log)
+        pass

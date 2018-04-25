@@ -2,49 +2,40 @@ from datetime import datetime, date
 
 
 class Post:
-    def __init__(self, group_id, timestamp, likes, reposts, views, text, members_count, attachments):
+    def __init__(self, group_id, group_name, timestamp, likes, reposts, views, text, members_count, attachments):
         self.group_id = group_id
+        self.group_name = group_name
         self.date = self.extract_date(timestamp)
         self.likes = likes
         self.reposts = reposts
         self.views = views
         self.text = text
-        self.conversion = self.likes / self.views
+        self.like_conversion = round(self.likes / self.views, 5)
         self.members_count = members_count
-        self.attachments = attachments
-        self.photos = self.extract_photos()
-        self.suitable = self.check_the_suitability()
+        self.photos = self.extract_photos(attachments)
+        self.suitable = self.check_the_suitability(attachments)
 
     def __str__(self):
-        return f'Id: {self.group_id}, Date: {self.date}, Likes: {self.likes}, Reposts: {self.reposts}, ' \
-               f'Views: {self.views}, Conversion: {self.conversion}, Attachments: {len(self.attachments)}, ' \
-               f'Photos: {len(self.photos)}, Members: {self.members_count}, Suitable: {self.suitable}, ' \
-               f'Text: "{self.text}".'
+        return ', '.join([f'{attribute}: {self.__dict__[attribute]}'for attribute in list(self.__dict__.keys())])
 
     def __eq__(self, other):
-        if isinstance(other, Post):
-            return self.group_id == other.group_id and self.date == other.date and self.likes == other.likes and \
-                   self.reposts == other.reposts and self.attachments == other.attachments and \
-                   self.views == other.views and self.photos == other.photos and self.text == other.text and \
-                   self.members_count == other.members_count and self.suitable == other.suitable and \
-                   self.conversion == other.conversion
+        if isinstance(other, other.__class__):
+            return self.__dict__ == other.__dict__
         return False
 
-    def extract_photos(self):
+    def extract_photos(self, attachments):
         """
         Extract photo ids from attachments json
         :return: list of photo ids
         """
-        if self.attachments == []:
-            return []
-        return [attachment['photo']['id'] for attachment in self.attachments if attachment['type'] == 'photo']
+        return [attachment['photo']['id'] for attachment in attachments if attachment['type'] == 'photo']
 
-    def check_the_suitability(self):
+    def check_the_suitability(self, attachments):
         """
         Checking that there are only photos in the post, that is, there are no videos, music, polls, etc.
         :return: True, if photos and attachments are the same size, False otherwise
         """
-        return len(self.attachments) == len(self.photos)
+        return len(attachments) == len(self.photos)
 
     @staticmethod
     def extract_date(timestamp):

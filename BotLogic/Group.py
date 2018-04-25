@@ -4,11 +4,12 @@ from datetime import date
 
 
 class Group:
-    def __init__(self, id, members_count):
+    def __init__(self, id, name, members_count):
         self.id = id
+        self.name = name
         self.members_count = members_count
         self.all_posts = self.get_all_posts()
-        self.yesterday_posts = self.get_yesterday_posts()
+        self.yesterday_posts = self.choose_yesterday_posts()
         self.top_post = self.choose_top_post()
 
     def get_all_posts(self):
@@ -19,12 +20,12 @@ class Group:
         method_name = 'wall.get'
         parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
         response = req().get(method_name, parameters)
-        posts = [Post(self.id, post['date'], post['likes']['count'], post['reposts']['count'], post['views']['count'],
-                      post['text'], self.members_count, post.get('attachments', []))
+        posts = [Post(self.id, self.name, post['date'], post['likes']['count'], post['reposts']['count'],
+                      post['views']['count'], post['text'], self.members_count, post.get('attachments', []))
                  for post in response['response']['items'] if post.get('views', 0) != 0]
         return posts
 
-    def get_yesterday_posts(self):
+    def choose_yesterday_posts(self):
         """
         Selects yesterday's posts from all posts
         :return: list of yesterday group posts
@@ -38,15 +39,15 @@ class Group:
     def choose_top_post(self):
         """
         Choose the post with the highest number of likes
-        :return: post
+        :return: best post
         """
         likes_max = 0
-        top_post = 0
+        top_post = Post(0, '', 1234567890, 0, 0, 1, '', 0, [])
         for post in self.yesterday_posts:
             if post.likes > likes_max:
                 likes_max = post.likes
                 top_post = post
-        if top_post == 0:
+        if top_post == Post(0, '', 1234567890, 0, 0, 1, '', 0, []):
             return None
         return top_post
 
@@ -63,5 +64,5 @@ class Group:
                 urls[i] = urls[i][6:]
         parameters = {'group_ids': ','.join(urls)}
         response = req().get(method_name, parameters)
-        ids = [info['id'] for info in response['response']]
+        ids = [group_info['id'] for group_info in response['response']]
         return ids

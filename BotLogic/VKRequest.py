@@ -18,9 +18,19 @@ class VKRequest:
         return params
 
     def get(self, method_name, parameters):
-        return requests.get(self.get_url(method_name, self.combine_params(parameters))).json()
+        result = ''
+        try:
+            result = requests.get(self.get_url(method_name, self.combine_params(parameters))).json()
+        except:
+            result = 'ERROR'
+        finally:
+            return result
 
     def post(self, method_name, parameters):
-        return requests.post(self.get_url(method_name, self.combine_params(parameters))).json()
-
-
+        result = ''
+        try:
+            result = requests.post(self.get_url(method_name, self.combine_params(parameters))).json()
+        except:
+            result = 'ERROR'
+        finally:
+            return result

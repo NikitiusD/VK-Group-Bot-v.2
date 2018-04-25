@@ -2,26 +2,28 @@ from datetime import datetime, date
 
 
 class Post:
-    def __init__(self, group_id, timestamp, likes, reposts, text, attachments):
+    def __init__(self, group_id, timestamp, likes, reposts, views, text, attachments):
         self.group_id = group_id
         self.date = self.eject_date(timestamp)
         self.likes = likes
         self.reposts = reposts
+        self.views = views
+        self.text = text
         self.attachments = attachments
         self.photos = self.eject_photos()
-        self.text = text
         self.suitable = self.check_the_suitability()
 
     def __str__(self):
         return f'Id: {self.group_id}, Date: {self.date}, Likes: {self.likes}, Reposts: {self.reposts}, ' \
-               f'Attachments: {len(self.attachments)}, Photos: {len(self.photos)}, Text: "{self.text}", ' \
-               f'Suitable: {self.suitable}.'
+               f'Views: {self.views}Attachments: {len(self.attachments)}, Photos: {len(self.photos)}, ' \
+               f'Text: "{self.text}", Suitable: {self.suitable}.'
 
     def __eq__(self, other):
         if isinstance(other, Post):
             return self.group_id == other.group_id and self.date == other.date and self.likes == other.likes and \
                    self.reposts == other.reposts and self.attachments == other.attachments and \
-                   self.photos == other.photos and self.text == other.text and self.suitable == other.suitable
+                   self.views == other.views and self.photos == other.photos and self.text == other.text and \
+                   self.suitable == other.suitable
         return False
 
     def eject_photos(self):

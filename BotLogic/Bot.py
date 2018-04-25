@@ -9,20 +9,29 @@ class Bot:
         with open('..\Information\meme_force_id.txt') as group_id:
             self.group_id = group_id.read()
         self.public_ids = self.get_public_ids()
+        self.members_counts = self.get_members_count()
         self.top_posts = self.get_top_posts()[:25]
         self.post_in_group()
 
     def get_public_ids(self):
         method_name = 'groups.getById'
-        parameters = {'group_id': self.group_id, 'fields': 'links'}
+        parameters = {'group_id': self.group_id, 'fields': 'links,members_count'}
         response = req().get(method_name, parameters)
         short_names = [info['url'].split('/')[3] for info in response['response'][0]['links']]
-        return Group.get_ids_from_urls(short_names)
+        ids = Group.get_ids_from_urls(short_names)
+        return ids
+
+    def get_members_count(self):
+        method_name = 'groups.getById'
+        parameters = {'group_ids': ','.join([str(id) for id in self.public_ids]), 'fields': 'members_count'}
+        response = req().get(method_name, parameters)
+        members_count = [group_info['members_count'] for group_info in response['response']]
+        return members_count
 
     def get_top_posts(self):
         top_posts = []
-        for id in self.public_ids:
-            group = Group(id)
+        for id, members_count in zip(self.public_ids, self.members_counts):
+            group = Group(id, members_count)
             top_posts.append(group.top_post)
         return top_posts
 

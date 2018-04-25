@@ -4,17 +4,18 @@ from datetime import date
 
 
 class Group:
-    def __init__(self, id):
+    def __init__(self, id, members_count):
         self.id = id
+        self.members_count = members_count
         self.all_posts = self.get_all_posts()
         self.yesterday_posts = self.get_yesterday_posts()
         self.top_post = self.choose_top_post()
 
     def get_all_posts(self):
         method_name = 'wall.get'
-        parameters = {'owner_id': f'-{self.id}', 'count': '100', 'filter': 'owner'}
+        parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
         response = req().get(method_name, parameters)
-        posts = [Post(self.id, post['date'], post['likes']['count'], post['reposts']['count'],
+        posts = [Post(self.id, post['date'], post['likes']['count'], post['reposts']['count'], post['views']['count'],
                       post['text'], post.get('attachments', [])) for post in response['response']['items']]
         return posts
 

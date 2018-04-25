@@ -16,7 +16,7 @@ class Bot:
 
     def get_group_ids(self):
         """
-        Gets the group ids from your group's link list
+        Gets the group ids from your groups link list
         :return: list of ids
         """
         method_name = 'groups.getById'
@@ -40,13 +40,19 @@ class Bot:
     def get_top_posts(self):
         """
         Gets the list of top posts, one post from each group
-        :return: list of top posts
+        :return: list of top suitable posts
         """
         top_posts = [Group(id, members_count).top_post for id, members_count in zip(self.group_ids, self.members_count)]
+        top_posts = [post for post in top_posts if post is not None and post.suitable]
         return top_posts
 
     def select_top_posts(self):
-        return self.top_posts[:25]
+        """
+        Selects best posts by sorting all posts by its conversion
+        :return: list of 25 top posts
+        """
+        sorted_posts = sorted(self.top_posts, key=lambda x: x.conversion, reverse=True)
+        return sorted_posts[:25]
 
     def post_in_group(self):
         """
@@ -54,12 +60,10 @@ class Bot:
         certain period, calculated on the basis of their number
         """
         publish_timestamp = Post.get_tomorrow_timestamp()
-        amount_of_posts = len([post for post in self.selected_posts if post is not None and post.suitable])
+        amount_of_posts = len(self.selected_posts)
         time_interval = round(24 * 60 * 60 / (amount_of_posts * 60)) - 1
 
         for i, post in enumerate(self.selected_posts):
-            if post is None or not post.suitable:
-                continue
             attachments = [f'photo-{post.group_id}_{photo}' for photo in post.photos]
             method_name = 'wall.post'
             parameters = {'owner_id': f'-{self.my_group_id}', 'from_group': 1, 'message': post.text,

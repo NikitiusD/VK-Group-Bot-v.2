@@ -33,13 +33,7 @@ class VKRequest:
         :param parameters: dictionary of parameters and it's values, access token and version already included
         :return: json response from VK API
         """
-        response = ''
-        try:
-            response = requests.get(self.get_url(method_name, self.combine_params(parameters))).json()
-        except:
-            response = 'ERROR'
-        finally:
-            return response
+        return requests.get(self.get_url(method_name, self.combine_params(parameters))).json()
 
     def post(self, method_name, parameters):
         """

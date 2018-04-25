@@ -2,28 +2,32 @@ from datetime import datetime, date
 
 
 class Post:
-    def __init__(self, group_id, timestamp, likes, reposts, views, text, attachments):
+    def __init__(self, group_id, timestamp, likes, reposts, views, text, members_count, attachments):
         self.group_id = group_id
         self.date = self.extract_date(timestamp)
         self.likes = likes
         self.reposts = reposts
         self.views = views
         self.text = text
+        self.conversion = self.likes / self.views
+        self.members_count = members_count
         self.attachments = attachments
         self.photos = self.extract_photos()
         self.suitable = self.check_the_suitability()
 
     def __str__(self):
         return f'Id: {self.group_id}, Date: {self.date}, Likes: {self.likes}, Reposts: {self.reposts}, ' \
-               f'Views: {self.views}Attachments: {len(self.attachments)}, Photos: {len(self.photos)}, ' \
-               f'Text: "{self.text}", Suitable: {self.suitable}.'
+               f'Views: {self.views}, Conversion: {self.conversion}, Attachments: {len(self.attachments)}, ' \
+               f'Photos: {len(self.photos)}, Members: {self.members_count}, Suitable: {self.suitable}, ' \
+               f'Text: "{self.text}".'
 
     def __eq__(self, other):
         if isinstance(other, Post):
             return self.group_id == other.group_id and self.date == other.date and self.likes == other.likes and \
                    self.reposts == other.reposts and self.attachments == other.attachments and \
                    self.views == other.views and self.photos == other.photos and self.text == other.text and \
-                   self.suitable == other.suitable
+                   self.members_count == other.members_count and self.suitable == other.suitable and \
+                   self.conversion == other.conversion
         return False
 
     def extract_photos(self):

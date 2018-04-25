@@ -20,7 +20,8 @@ class Group:
         parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
         response = req().get(method_name, parameters)
         posts = [Post(self.id, post['date'], post['likes']['count'], post['reposts']['count'], post['views']['count'],
-                      post['text'], post.get('attachments', [])) for post in response['response']['items']]
+                      post['text'], self.members_count, post.get('attachments', []))
+                 for post in response['response']['items'] if post.get('views', 0) != 0]
         return posts
 
     def get_yesterday_posts(self):

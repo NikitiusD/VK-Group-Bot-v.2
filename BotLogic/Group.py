@@ -1,6 +1,6 @@
 from BotLogic.VKRequest import VKRequest as req
 from BotLogic.Post import Post
-from datetime import date
+from BotLogic.UsefullFunctions import get_yesterday
 
 
 class Group:
@@ -36,9 +36,7 @@ class Group:
         Selects yesterday's posts from all posts
         :return: list of yesterday group posts
         """
-        today = date.today().strftime('%Y-%m-%d')
-        yesterday = date(int(today.split('-')[0]), int(today.split('-')[1]), int(today.split('-')[2]) - 1)\
-            .strftime('%Y-%m-%d')
+        yesterday = get_yesterday()
         yesterday_posts = [post for post in self.all_posts if post.date == yesterday]
         return yesterday_posts
 

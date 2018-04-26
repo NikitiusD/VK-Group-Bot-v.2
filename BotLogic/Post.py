@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from BotLogic.UsefullFunctions import extract_date
 
 
 class Post:
@@ -6,7 +6,7 @@ class Post:
         self.group_id = group_id
         self.group_name = group_name
         self.members_count = members_count
-        self.date = self.extract_date(timestamp)
+        self.date = extract_date(timestamp)
         self.likes = likes
         self.reposts = reposts
         self.views = views
@@ -42,21 +42,3 @@ class Post:
                 self.docs.append((attachment['doc']['owner_id'], attachment['doc']['id']))
             if attachment['type'] == 'note':
                 self.notes.append((attachment['note']['owner_id'], attachment['note']['id']))
-
-    @staticmethod
-    def extract_date(timestamp):
-        """
-        Convert timestamp to date in YYYY-MM-DD format
-        :param timestamp: string timestamp, maybe from VK API response
-        :return: string in YYYY-MM-DD format
-        """
-        return datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d')
-
-    @classmethod
-    def get_tomorrow_timestamp(cls):
-        """
-        Get timestamp of tomorrow day at 00:00:00
-        :return: integer timestamp
-        """
-        today = date.today().strftime('%Y-%m-%d')
-        return datetime(int(today.split('-')[0]), int(today.split('-')[1]), int(today.split('-')[2]) + 1).timestamp()

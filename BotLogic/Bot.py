@@ -12,7 +12,7 @@ class Bot:
     vk_limit = 25
 
     def __init__(self):
-        with open('..\Information\meme_force_id.txt') as group_id:
+        with open('..\Information\\your_public_id.txt') as group_id:
             self.my_group_id = group_id.read()
         self.group_ids = self.get_group_ids()
         self.group_names = self.get_group_names()

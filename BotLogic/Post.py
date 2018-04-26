@@ -11,31 +11,41 @@ class Post:
         self.views = views
         self.text = text
         self.like_conversion = round(self.likes / self.views, 5)
+        self.photos = []
+        self.videos = []
+        self.audios = []
+        self.polls = []
+        self.notes = []
+        self.docs = []
         self.members_count = members_count
-        self.photos = self.extract_photos(attachments)
-        self.suitable = self.check_the_suitability(attachments)
+        self.extract_media(attachments)
 
     def __str__(self):
         return ', '.join([f'{attribute}: {self.__dict__[attribute]}'for attribute in list(self.__dict__.keys())])
 
     def __eq__(self, other):
-        if isinstance(other, other.__class__):
+        if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return False
 
-    def extract_photos(self, attachments):
+    def extract_media(self, attachments):
         """
-        Extract photo ids from attachments json
-        :return: list of photo ids
+        Extract media from attachments
+        :param attachments: attachments json from VK API's response
         """
-        return [attachment['photo']['id'] for attachment in attachments if attachment['type'] == 'photo']
-
-    def check_the_suitability(self, attachments):
-        """
-        Checking that there are only photos in the post, that is, there are no videos, music, polls, etc.
-        :return: True, if photos and attachments are the same size, False otherwise
-        """
-        return len(attachments) == len(self.photos)
+        for attachment in attachments:
+            if attachment['type'] == 'photo':
+                self.photos.append(attachment['photo']['id'])
+            if attachment['type'] == 'video':
+                self.videos.append(attachment['video']['id'])
+            if attachment['type'] == 'audio':
+                self.audios.append(attachment['audio']['id'])
+            if attachment['type'] == 'poll':
+                self.polls.append(attachment['poll']['id'])
+            if attachment['type'] == 'doc':
+                self.docs.append(attachment['doc']['id'])
+            if attachment['type'] == 'note':
+                self.notes.append(attachment['note']['id'])
 
     @staticmethod
     def extract_date(timestamp):

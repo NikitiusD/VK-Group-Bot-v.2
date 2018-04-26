@@ -8,6 +8,8 @@ import os
 
 
 class Bot:
+    vk_limit = 25
+
     def __init__(self):
         with open('..\Information\meme_force_id.txt') as group_id:
             self.my_group_id = group_id.read()
@@ -16,7 +18,7 @@ class Bot:
         self.members_count = self.get_members_count()
         self.top_posts = self.get_top_posts()
         self.selected_posts = self.select_top_posts()
-        self.post_in_group()
+        # self.post_in_group()
         self.log_posts()
 
     def get_group_ids(self):
@@ -56,11 +58,11 @@ class Bot:
     def get_top_posts(self):
         """
         Gets the list of top posts, one post from each group
-        :return: list of top suitable posts
+        :return: list of top posts
         """
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
-        top_posts = [post for post in top_posts if post is not None and post.suitable]
+        top_posts = [post for post in top_posts if post is not None]
         return top_posts
 
     def select_top_posts(self):
@@ -69,7 +71,7 @@ class Bot:
         :return: list of 25 top posts
         """
         sorted_posts = sorted(self.top_posts, key=lambda x: x.like_conversion, reverse=True)
-        return sorted_posts[:25]
+        return sorted_posts[:self.vk_limit] if len(sorted_posts) >= self.vk_limit else sorted_posts
 
     def post_in_group(self):
         """

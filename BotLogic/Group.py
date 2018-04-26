@@ -22,7 +22,7 @@ class Group:
         response = req().get(method_name, parameters)
         posts = [Post(self.id, self.name, post['date'], post['likes']['count'], post['reposts']['count'],
                       post['views']['count'], post['text'], self.members_count, post.get('attachments', []))
-                 for post in response['response']['items'] if post.get('views', 0) != 0]
+                 for post in response['response']['items'] if post.get('views', 0) != 0 and post['marked_as_ads'] == 0]
         return posts
 
     def choose_yesterday_posts(self):
@@ -41,15 +41,9 @@ class Group:
         Choose the post with the highest number of likes
         :return: best post
         """
-        likes_max = 0
-        top_post = Post(0, '', 1234567890, 0, 0, 1, '', 0, [])
-        for post in self.yesterday_posts:
-            if post.likes > likes_max:
-                likes_max = post.likes
-                top_post = post
-        if top_post == Post(0, '', 1234567890, 0, 0, 1, '', 0, []):
+        if len(self.yesterday_posts) == 0:
             return None
-        return top_post
+        return sorted(self.yesterday_posts, key=lambda x: x.likes, reverse=True)[0]
 
     @staticmethod
     def get_ids_from_urls(urls):

@@ -40,12 +40,12 @@ class VKRequest:
         Makes POST request containing data necessary for VK API
         :param method_name: string of VK API method
         :param parameters: dictionary of parameters and it's values, access token and version already included
-        :return: json response from VK API
+        :return: json response from VK API or error, usually that happens because of the length of text in post
         """
         response = ''
         try:
             response = requests.post(self.get_url(method_name, self.combine_params(parameters))).json()
         except:
-            response = 'ERROR'
+            response = f'ERROR: {requests.post(self.get_url(method_name, self.combine_params(parameters)))}'
         finally:
             return response

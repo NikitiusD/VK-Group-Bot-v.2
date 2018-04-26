@@ -15,14 +15,20 @@ class Group:
     def get_all_posts(self):
         """
         Gets information about the last 100 posts of a group and converts them to a list of instances of the Post class
-        :return: list of group posts
+        :return: list of suitable group posts
         """
+        def suitable(post):
+            return post.get('views', 0) != 0 and \
+                   post['marked_as_ads'] == 0 and \
+                   'vk.com/' not in post['text'] and \
+                   '[club' not in post['text']
+
         method_name = 'wall.get'
         parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
         response = req().get(method_name, parameters)
-        posts = [Post(self.id, self.name, post['date'], post['likes']['count'], post['reposts']['count'],
-                      post['views']['count'], post['text'], self.members_count, post.get('attachments', []))
-                 for post in response['response']['items'] if post.get('views', 0) != 0 and post['marked_as_ads'] == 0]
+        posts = [Post(self.id, self.name, self.members_count, post['date'], post['likes']['count'],
+                      post['reposts']['count'], post['views']['count'], post['text'], post.get('attachments', []))
+                 for post in response['response']['items'] if suitable(post)]
         return posts
 
     def choose_yesterday_posts(self):

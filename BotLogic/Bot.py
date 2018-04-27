@@ -1,5 +1,6 @@
 from BotLogic.VKRequest import VKRequest as req
 from BotLogic.Group import Group
+from BotLogic.UsefullFunctions import get_tomorrow_timestamp
 from BotLogic.Post import Post
 from time import sleep
 from datetime import date
@@ -88,7 +89,7 @@ class Bot:
         Makes deferred posts in your group of 25 selected posts in such a way that they are published after a
         certain period, calculated on the basis of their number
         """
-        publish_timestamp = Post.get_tomorrow_timestamp()
+        publish_timestamp = get_tomorrow_timestamp()
         amount_of_posts = len(self.selected_posts)
         time_interval = round(24 * 60 * 60 / (amount_of_posts * 60)) - 1
 

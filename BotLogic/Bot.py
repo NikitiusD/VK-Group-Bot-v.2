@@ -1,3 +1,4 @@
+from BotLogic.Post import Post
 from BotLogic.VKRequest import VKRequest as req
 from BotLogic.Group import Group
 from BotLogic.UsefullFunctions import get_tomorrow_timestamp
@@ -20,8 +21,8 @@ class Bot:
         self.members_count = self.get_members_count()
         self.top_posts = self.get_top_posts()
         self.selected_posts = self.select_top_posts()
-        # self.post_in_group()
-        # self.log_posts()
+        self.post_in_group()
+        self.log_posts()
         self.print_main_info()
 
     def get_group_ids(self):
@@ -66,8 +67,12 @@ class Bot:
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
         top_posts = [post for post in top_posts if post is not None]
-        # top_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct, reverse=True)
-        top_posts = sorted(top_posts, key=lambda x: x.likes_per_repost, reverse=False)
+        top_repost_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct, reverse=True)
+        top_like_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct, reverse=True)
+        for post in top_posts:
+            post.place = top_repost_posts.index(post) + top_like_posts.index(post)
+
+        top_posts = sorted(top_posts, key=lambda x: x.place, reverse=False)
         return top_posts
 
     def select_top_posts(self):
@@ -125,12 +130,11 @@ class Bot:
         pass
 
     def print_main_info(self):
-        top_posts = self.selected_posts
-        # top_posts = sorted(self.selected_posts, key=lambda x: x.repost_conversion_pct, reverse=True)
-        top_posts = sorted(self.selected_posts, key=lambda x: x.likes_per_repost, reverse=False)
+        top_posts = sorted(self.selected_posts, key=lambda x: x.place, reverse=False)
         like_repost_plot(top_posts)
 
-        # print(len(self.top_posts))
-        # for post in self.top_posts:
-        #     print(f'{post.like_conversion_pct} - {post.repost_conversion_pct}')
-        # pass
+        print(len(top_posts))
+        print('Place - Like conv. - Repost conv.')
+        for post in top_posts:
+            print(f'{post.place} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
+        pass

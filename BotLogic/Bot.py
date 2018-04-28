@@ -1,7 +1,7 @@
 from BotLogic.VKRequest import VKRequest as req
 from BotLogic.Group import Group
 from BotLogic.UsefullFunctions import get_tomorrow_timestamp
-from BotLogic.Post import Post
+from BotLogic.UsefullFunctions import like_repost_plot
 from time import sleep
 from datetime import date
 from random import shuffle
@@ -20,8 +20,8 @@ class Bot:
         self.members_count = self.get_members_count()
         self.top_posts = self.get_top_posts()
         self.selected_posts = self.select_top_posts()
-        self.post_in_group()
-        self.log_posts()
+        # self.post_in_group()
+        # self.log_posts()
         self.print_main_info()
 
     def get_group_ids(self):
@@ -66,7 +66,8 @@ class Bot:
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
         top_posts = [post for post in top_posts if post is not None]
-        top_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct, reverse=True)
+        # top_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct, reverse=True)
+        top_posts = sorted(top_posts, key=lambda x: x.likes_per_repost, reverse=False)
         return top_posts
 
     def select_top_posts(self):
@@ -74,8 +75,8 @@ class Bot:
         Selects 25 or less best posts with some randomization and shuffle them
         :return: list of posts
         """
-        if len(self.top_posts) >= int((self.vk_limit * 1.6)):
-            selected_posts = self.top_posts[:int((self.vk_limit * 1.6))]
+        if len(self.top_posts) >= int((self.vk_limit * 1.4)):
+            selected_posts = self.top_posts[:int((self.vk_limit * 1.4))]
         elif len(self.top_posts) >= self.vk_limit:
             selected_posts = self.top_posts[:self.vk_limit]
         else:
@@ -124,7 +125,12 @@ class Bot:
         pass
 
     def print_main_info(self):
-        print(len(self.top_posts))
-        for post in self.top_posts:
-            print(f'{post.like_conversion_pct} - {post.repost_conversion_pct}')
-        pass
+        top_posts = self.selected_posts
+        # top_posts = sorted(self.selected_posts, key=lambda x: x.repost_conversion_pct, reverse=True)
+        top_posts = sorted(self.selected_posts, key=lambda x: x.likes_per_repost, reverse=False)
+        like_repost_plot(top_posts)
+
+        # print(len(self.top_posts))
+        # for post in self.top_posts:
+        #     print(f'{post.like_conversion_pct} - {post.repost_conversion_pct}')
+        # pass

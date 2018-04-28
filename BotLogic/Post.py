@@ -1,4 +1,5 @@
 from BotLogic.UsefullFunctions import extract_date
+from math import inf
 
 
 class Post:
@@ -9,10 +10,11 @@ class Post:
         self.date = extract_date(timestamp)
         self.likes = likes
         self.reposts = reposts
+        self.likes_per_repost = round(self.likes / self.reposts) if self.reposts != 0 else inf
         self.views = views
+        self.like_conversion_pct = round((self.likes / self.views) * 100, 5) if self.views != 0 else 0
+        self.repost_conversion_pct = (self.reposts / self.views) * 100 if self.views != 0 else 0
         self.text = text
-        self.like_conversion_pct = round((self.likes / self.views) * 100, 5)
-        self.repost_conversion_pct = (self.reposts / self.views) * 100 if self.reposts != 0 else 0
         self.photos, self.videos, self.audios, self.polls, self.notes, self.docs = [], [], [], [], [], []
         self.extract_media(attachments)
 

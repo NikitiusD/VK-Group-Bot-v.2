@@ -1,4 +1,3 @@
-from BotLogic.Post import Post
 from BotLogic.VKRequest import VKRequest as req
 from BotLogic.Group import Group
 from BotLogic.UsefullFunctions import get_tomorrow_timestamp
@@ -67,12 +66,12 @@ class Bot:
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
         top_posts = [post for post in top_posts if post is not None]
-        top_repost_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct, reverse=True)
-        top_like_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct, reverse=True)
+        top_repost_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct)
+        top_like_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct)
         for post in top_posts:
-            post.place = top_repost_posts.index(post) + top_like_posts.index(post)
+            post.overall_rating = top_repost_posts.index(post) + top_like_posts.index(post)
 
-        top_posts = sorted(top_posts, key=lambda x: x.place, reverse=False)
+        top_posts = sorted(top_posts, key=lambda x: x.overall_rating, reverse=True)
         return top_posts
 
     def select_top_posts(self):
@@ -123,18 +122,22 @@ class Bot:
             os.mkdir('..\logs', 777)
         except OSError:
             pass
-        json_log = json.dumps([post.__dict__ for post in self.selected_posts], indent=4, ensure_ascii=False)
+        json_log = json.dumps([post.__dict__ for post in self.selected_posts], indent=4,
+                              ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
         with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
+
         pass
 
     def print_main_info(self):
-        top_posts = sorted(self.selected_posts, key=lambda x: x.place, reverse=False)
+        """
+        Prints main attributes of each selected post and saves plots
+        """
+        top_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
         like_repost_plot(top_posts)
 
-        print(len(top_posts))
-        print('Place - Like conv. - Repost conv.')
+        print('Overall rating - Like conv. - Repost conv.')
         for post in top_posts:
-            print(f'{post.place} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
+            print(f'{post.overall_rating} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
         pass

@@ -2,6 +2,7 @@
 .idea/
 access_token.txt
 log_*.txt
+log_*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

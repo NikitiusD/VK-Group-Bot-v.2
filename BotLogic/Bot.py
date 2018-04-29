@@ -65,7 +65,7 @@ class Bot:
         """
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
-        top_posts = [post for post in top_posts if post is not None]
+        top_posts = [post for post in top_posts if post is not None and post.reposts > 5]
         top_repost_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct)
         top_like_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct)
         for post in top_posts:
@@ -137,7 +137,9 @@ class Bot:
         top_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
         like_repost_plot(top_posts)
 
+        print(len(self.top_posts))
         print('Overall rating - Like conv. - Repost conv.')
         for post in top_posts:
             print(f'{post.overall_rating} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
+
         pass

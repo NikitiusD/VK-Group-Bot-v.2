@@ -5,9 +5,7 @@ import matplotlib.pyplot as plt
 
 def like_repost_plot(posts):
     """
-    
-    :param posts:
-    :return:
+    Creates useful plots and logs them
     """
     border = len(posts) + 1
     x = np.arange(1, border)

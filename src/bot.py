@@ -1,6 +1,6 @@
 from src.vk_request import VKRequest as req
 from src.group import Group
-from src.useful_functions import get_tomorrow_timestamp, like_repost_plot
+from src.useful_functions import get_tomorrow_timestamp, create_like_repost_plot
 from time import sleep
 from datetime import date
 from random import shuffle
@@ -131,7 +131,7 @@ class Bot:
         with open(f'..\logs\log_{today}.txt', 'w+') as file:
             file.write(json_log)
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
-        with open(f'..\logs\log_bad_groups_{today}.txt', 'w+') as file:
+        with open(f'..\logs\log_{today}_bad_groups.txt', 'w+') as file:
             file.write(bad_groups)
 
     def print_main_info(self):
@@ -139,7 +139,7 @@ class Bot:
         Prints main attributes of each selected post, names of bad groups and saves plots
         """
         top_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
-        like_repost_plot(top_posts)
+        create_like_repost_plot(top_posts)
 
         print(len(self.top_posts))
         print('Overall rating - Like conv. - Repost conv.')

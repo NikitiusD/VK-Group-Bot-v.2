@@ -1,11 +1,11 @@
 import requests
+import json
 
 
 class VKRequest:
     def __init__(self):
-        with open('..\Information\\access_token.txt') as token:
-            self.access_token = token.read()
-        self.version = '5.74'
+        self.access_token = json.load(open('..\config.json'))['access_token']
+        self.version = json.load(open('..\config.json'))['version']
 
     def get_url(self, method_name, parameters):
         """

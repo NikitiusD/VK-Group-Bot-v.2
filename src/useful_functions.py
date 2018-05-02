@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def like_repost_plot(posts):
+def create_like_repost_plot(posts):
     """
     Creates useful plots and logs them
     """

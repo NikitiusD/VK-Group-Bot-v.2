@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -84,8 +84,8 @@ def get_tomorrow_timestamp():
     Gets timestamp of tomorrow day at 00:00:00
     :return: integer timestamp
     """
-    today = date.today()
-    return datetime(today.year, today.month, today.day + 1).timestamp()
+    tomorrow = datetime.today() + timedelta(days=1)
+    return tomorrow.timestamp()
 
 
 def get_yesterday():
@@ -93,5 +93,5 @@ def get_yesterday():
     Gets yesterday date
     :return: date
     """
-    today = date.today()
-    return date(today.year, today.month, today.day - 1)
+    yesterday = date.today() - timedelta(days=1)
+    return yesterday

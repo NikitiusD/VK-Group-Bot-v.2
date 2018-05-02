@@ -141,7 +141,7 @@ class Bot:
         top_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
         create_like_repost_plot(top_posts)
 
-        print(len(self.top_posts))
+        print(f'Amount of posts: {len(self.top_posts)}')
         print('Overall rating - Like conv. - Repost conv.')
         for post in top_posts:
             print(f'{post.overall_rating} - {post.like_conversion_pct} - {post.repost_conversion_pct}')

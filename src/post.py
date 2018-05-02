@@ -1,4 +1,4 @@
-from BotLogic.UsefullFunctions import extract_date
+from src.useful_functions import extract_date
 from math import inf
 
 

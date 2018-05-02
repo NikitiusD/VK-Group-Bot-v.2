@@ -1,7 +1,6 @@
-from BotLogic.VKRequest import VKRequest as req
-from BotLogic.Group import Group
-from BotLogic.UsefullFunctions import get_tomorrow_timestamp
-from BotLogic.UsefullFunctions import like_repost_plot
+from src.vk_request import VKRequest as req
+from src.group import Group
+from src.useful_functions import get_tomorrow_timestamp, like_repost_plot
 from time import sleep
 from datetime import date
 from random import shuffle
@@ -14,8 +13,7 @@ class Bot:
     bad_groups = []
 
     def __init__(self):
-        with open('..\Information\\your_public_id.txt') as group_id:
-            self.my_group_id = group_id.read()
+        self.my_group_id = json.load(open('..\config.json'))['group_id']
         self.group_ids = self.get_group_ids()
         self.group_names = self.get_group_names()
         self.members_count = self.get_members_count()
@@ -84,8 +82,9 @@ class Bot:
         Selects 25 or less best posts with some randomization and shuffle them
         :return: list of posts
         """
-        if len(self.top_posts) >= int((self.vk_limit * 1.4)):
-            selected_posts = self.top_posts[:int((self.vk_limit * 1.4))]
+        k = 1.4
+        if len(self.top_posts) >= self.vk_limit * k:
+            selected_posts = self.top_posts[:int((self.vk_limit * k))]
         elif len(self.top_posts) >= self.vk_limit:
             selected_posts = self.top_posts[:self.vk_limit]
         else:
@@ -117,7 +116,6 @@ class Bot:
             print(response)
             publish_timestamp += time_interval * 60
             sleep(0.33)
-        pass
 
     def log_posts(self):
         """
@@ -130,12 +128,11 @@ class Bot:
         json_log = json.dumps([post.__dict__ for post in self.selected_posts], indent=4,
                               ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
-        with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
+        with open(f'..\logs\log_{today}.txt', 'w+') as file:
             file.write(json_log)
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
-        with open(f'..\logs\log_bad_groups_{today}.txt', 'w+', encoding='utf-8') as file:
+        with open(f'..\logs\log_bad_groups_{today}.txt', 'w+') as file:
             file.write(bad_groups)
-        pass
 
     def print_main_info(self):
         """
@@ -149,5 +146,3 @@ class Bot:
         for post in top_posts:
             print(f'{post.overall_rating} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
         print('Bad Groups: ', [group[1] for group in self.bad_groups])
-
-        pass

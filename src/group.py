@@ -1,6 +1,6 @@
-from BotLogic.VKRequest import VKRequest as req
-from BotLogic.Post import Post
-from BotLogic.UsefullFunctions import get_yesterday
+from src.vk_request import VKRequest as req
+from src.post import Post
+from src.useful_functions import get_yesterday
 
 
 class Group:

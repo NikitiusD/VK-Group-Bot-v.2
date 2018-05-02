@@ -1,4 +1,4 @@
-from BotLogic.Bot import Bot
+from src.bot import Bot
 
 
 def main():

@@ -11,6 +11,7 @@ import os
 
 class Bot:
     vk_limit = 25
+    bad_groups = []
 
     def __init__(self):
         with open('..\Information\\your_public_id.txt') as group_id:
@@ -65,7 +66,11 @@ class Bot:
         """
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
+        bad_group_indexes = [index for index, post in enumerate(top_posts) if post is None]
+        self.bad_groups = [(self.group_ids[index], self.group_names[index]) for index, post in enumerate(top_posts)
+                           if index in bad_group_indexes]
         top_posts = [post for post in top_posts if post is not None and post.reposts > 5]
+
         top_repost_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct)
         top_like_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct)
         for post in top_posts:
@@ -116,7 +121,7 @@ class Bot:
 
     def log_posts(self):
         """
-        Logs all posted posts
+        Logs all posted posts and groups without posts
         """
         try:
             os.mkdir('..\logs', 777)
@@ -127,12 +132,14 @@ class Bot:
         today = date.today().strftime('%Y-%m-%d')
         with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
-
+        bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
+        with open(f'..\logs\log_bad_groups_{today}.txt', 'w+', encoding='utf-8') as file:
+            file.write(bad_groups)
         pass
 
     def print_main_info(self):
         """
-        Prints main attributes of each selected post and saves plots
+        Prints main attributes of each selected post, names of bad groups and saves plots
         """
         top_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
         like_repost_plot(top_posts)
@@ -141,5 +148,6 @@ class Bot:
         print('Overall rating - Like conv. - Repost conv.')
         for post in top_posts:
             print(f'{post.overall_rating} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
+        print('Bad Groups: ', [group[1] for group in self.bad_groups])
 
         pass

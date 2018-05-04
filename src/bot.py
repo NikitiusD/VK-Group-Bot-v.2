@@ -130,10 +130,10 @@ class Bot:
         json_log = json.dumps([post.__dict__ for post in self.selected_posts], indent=4,
                               ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
-        with open(f'..\logs\log_{today}.txt', 'w+') as file:
+        with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
-        with open(f'..\logs\log_{today}_bad_groups.txt', 'w+') as file:
+        with open(f'..\logs\log_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
             file.write(bad_groups)
 
     def print_main_info(self):

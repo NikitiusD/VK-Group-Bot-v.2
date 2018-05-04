@@ -1,6 +1,6 @@
-from src.vk_request import VKRequest as req
-from src.group import Group
-from src.useful_functions import get_tomorrow_timestamp, create_like_repost_plot
+from vk_request import VKRequest as req
+from group import Group
+from useful_functions import get_tomorrow_timestamp, create_like_repost_plot
 from time import sleep
 from datetime import date
 from random import shuffle
@@ -67,6 +67,7 @@ class Bot:
         """
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
+
         bad_group_indexes = [index for index, post in enumerate(top_posts) if post is None]
         self.bad_groups = [(self.group_ids[index], self.group_names[index]) for index, post in enumerate(top_posts)
                            if index in bad_group_indexes]
@@ -92,8 +93,8 @@ class Bot:
         else:
             selected_posts = self.top_posts
         shuffle(selected_posts)
-
-        return selected_posts[:self.vk_limit] if len(self.top_posts) >= self.vk_limit else selected_posts
+        selected_posts = selected_posts[:self.vk_limit] if len(self.top_posts) >= self.vk_limit else selected_posts
+        return selected_posts
 
     def post_in_group(self):
         """
@@ -101,8 +102,7 @@ class Bot:
         certain period, calculated on the basis of their number
         """
         publish_timestamp = get_tomorrow_timestamp()
-        amount_of_posts = len(self.selected_posts)
-        time_interval = round(24 * 60 * 60 / (amount_of_posts * 60)) - 1
+        time_interval = round(24 * 60 * 60 / (len(self.selected_posts) * 60)) - 1
 
         for post in self.selected_posts:
             attachments = [f'photo{photo[0]}_{photo[1]}' for photo in post.photos] + \
@@ -127,11 +127,13 @@ class Bot:
             os.mkdir('..\logs', 777)
         except OSError:
             pass
-        json_log = json.dumps([post.__dict__ for post in self.selected_posts], indent=4,
-                              ensure_ascii=False, default=str)
+        json_log = json.dumps([post.__dict__ for post in self.selected_posts],
+                              indent=4, ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
+
         with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
+
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
         with open(f'..\logs\log_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
             file.write(bad_groups)
@@ -140,11 +142,11 @@ class Bot:
         """
         Prints main attributes of each selected post, names of bad groups and saves plots
         """
-        top_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
-        create_like_repost_plot(top_posts)
+        selected_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
+        create_like_repost_plot(selected_posts)
 
-        print(f'Amount of posts: {len(self.top_posts)}')
+        print(f'Amount of posts: {len(self.top_posts)}, from {len(self.group_ids)} groups.')
         print('Overall rating - Like conv. - Repost conv.')
-        for post in top_posts:
+        for post in selected_posts:
             print(f'{post.overall_rating} - {post.like_conversion_pct} - {post.repost_conversion_pct}')
-        print('Bad Groups: ', [group[1] for group in self.bad_groups])
+        print(f'Bad Groups: {[group[1] for group in self.bad_groups]}.')

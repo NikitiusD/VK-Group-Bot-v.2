@@ -1,6 +1,6 @@
-from src.vk_request import VKRequest as req
-from src.post import Post
-from src.useful_functions import get_yesterday
+from vk_request import VKRequest as req
+from post import Post
+from useful_functions import get_yesterday
 
 
 class Group:

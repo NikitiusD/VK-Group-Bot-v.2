@@ -65,9 +65,7 @@ def create_like_repost_plot(posts):
     figure = plt.gcf()
     figure.set_size_inches(16, 9)
     plt.savefig(f'..\logs\log_{today}.png', dpi=120)
-
-    plt.show()
-    pass
+    # plt.show()
 
 
 def extract_date(timestamp):
@@ -85,7 +83,7 @@ def get_tomorrow_timestamp():
     :return: integer timestamp
     """
     tomorrow = datetime.today() + timedelta(days=1)
-    return tomorrow.timestamp()
+    return datetime(year=tomorrow.year, month=tomorrow.month, day=tomorrow.day).timestamp()
 
 
 def get_yesterday():

@@ -9,11 +9,14 @@ import os
 
 
 class Bot:
-    vk_limit = 25
     bad_groups = []
 
     def __init__(self):
-        self.my_group_id = json.load(open('..\config.json'))['group_id']
+        config = json.load(open('..\config.json'))
+        self.my_group_id = config['group_id']
+        self.vk_limit = config['vk_limit']
+        self.repost_border = config['repost_border']
+        self.scatter = config['scatter']
         self.group_ids = self.get_group_ids()
         self.group_names = self.get_group_names()
         self.members_count = self.get_members_count()
@@ -67,7 +70,7 @@ class Bot:
         bad_group_indexes = [index for index, post in enumerate(top_posts) if post is None]
         self.bad_groups = [(self.group_ids[index], self.group_names[index]) for index, post in enumerate(top_posts)
                            if index in bad_group_indexes]
-        top_posts = [post for post in top_posts if post is not None and post.reposts > 5]
+        top_posts = [post for post in top_posts if post is not None and post.reposts > self.repost_border]
 
         top_repost_posts = sorted(top_posts, key=lambda x: x.repost_conversion_pct)
         top_like_posts = sorted(top_posts, key=lambda x: x.like_conversion_pct)
@@ -82,9 +85,8 @@ class Bot:
         Selects 25 or less best posts with some randomization and shuffle them
         :return: list of posts
         """
-        k = 1.4
-        if len(self.top_posts) >= self.vk_limit * k:
-            selected_posts = self.top_posts[:int((self.vk_limit * k))]
+        if len(self.top_posts) >= self.vk_limit * self.scatter:
+            selected_posts = self.top_posts[:int((self.vk_limit * self.scatter))]
         elif len(self.top_posts) >= self.vk_limit:
             selected_posts = self.top_posts[:self.vk_limit]
         else:

@@ -18,10 +18,8 @@ class Group:
         :return: list of suitable group posts
         """
         def suitable(post):
-            return post.get('views', 0) != 0 and \
-                   post['marked_as_ads'] == 0 and \
-                   'vk.com/' not in post['text'] and \
-                   '[club' not in post['text']
+            return (post.get('views', 0) != 0 and post.get('copy_history', 0) == 0 and post['marked_as_ads'] == 0 and
+                    'vk.com/' not in post['text'] and '[club' not in post['text'])
 
         method_name = 'wall.get'
         parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
@@ -42,12 +40,17 @@ class Group:
 
     def choose_top_post(self):
         """
-        Choose the post with the highest number of likes
-        :return: best post
+        Chooses the best post
+        :return: post
         """
         if len(self.yesterday_posts) == 0:
             return None
-        return sorted(self.yesterday_posts, key=lambda x: x.likes, reverse=True)[0]
+        top_repost_posts = sorted(self.yesterday_posts, key=lambda x: x.repost_conversion_pct)
+        top_like_posts = sorted(self.yesterday_posts, key=lambda x: x.like_conversion_pct)
+        for post in self.yesterday_posts:
+            post.overall_rating = top_repost_posts.index(post) + top_like_posts.index(post)
+        top_posts = sorted(self.yesterday_posts, key=lambda x: x.overall_rating, reverse=True)
+        return top_posts[0]
 
     @staticmethod
     def get_ids_from_urls(urls):

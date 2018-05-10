@@ -1,8 +1,17 @@
 {
     "token": "https://oauth.vk.com/authorize?client_id=6289595&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends,photos,audio,video,status,wall,offline,groups,messages,manage&response_type=token&v=5.74",
-    "group_id": "158155713",
-    "version": "5.74",
+    "group_id": [
+        "158155713"
+    ],
+    "number_of_posts": [
+        25
+    ],
+    "repost_border": [
+        5
+    ],
+    "scatter": [
+        1.4
+    ],
     "vk_limit": 25,
-    "repost_border": 5,
-    "scatter": 1.4
+    "version": "5.74"
 }

@@ -9,14 +9,15 @@ import os
 
 
 class Bot:
+    vk_limit = json.load(open('..\config.json'))['vk_limit']
     bad_groups = []
 
-    def __init__(self):
-        config = json.load(open('..\config.json'))
-        self.my_group_id = config['group_id']
-        self.vk_limit = config['vk_limit']
-        self.repost_border = config['repost_border']
-        self.scatter = config['scatter']
+    def __init__(self, index, id, number_of_posts, repost_border, scatter):
+        self.index = index + 1
+        self.my_group_id = id
+        self.number_of_posts = number_of_posts
+        self.repost_border = repost_border
+        self.scatter = scatter
         self.group_ids = self.get_group_ids()
         self.group_names = self.get_group_names()
         self.members_count = self.get_members_count()
@@ -83,34 +84,35 @@ class Bot:
 
     def select_top_posts(self):
         """
-        Selects 25 or less best posts with some randomization and shuffle them
+        Selects best posts with some randomization by shuffling them
         :return: list of posts
         """
-        if len(self.top_posts) >= self.vk_limit * self.scatter:
-            selected_posts = self.top_posts[:int((self.vk_limit * self.scatter))]
-        elif len(self.top_posts) >= self.vk_limit:
-            selected_posts = self.top_posts[:self.vk_limit]
+        if len(self.top_posts) >= self.number_of_posts * self.scatter:
+            selected_posts = self.top_posts[:int((self.number_of_posts * self.scatter))]
+        elif len(self.top_posts) >= self.number_of_posts:
+            selected_posts = self.top_posts[:self.number_of_posts]
         else:
             selected_posts = self.top_posts
         shuffle(selected_posts)
-        selected_posts = selected_posts[:self.vk_limit] if len(self.top_posts) >= self.vk_limit else selected_posts
+        if len(selected_posts) > self.vk_limit:
+            selected_posts = selected_posts[:self.vk_limit]
         return selected_posts
 
     def post_in_group(self):
         """
-        Makes deferred posts in your group of 25 selected posts in such a way that they are published after a
+        Makes deferred posts in your group of selected posts in such a way that they are published after a
         certain period, calculated on the basis of their number
         """
         publish_timestamp = get_tomorrow_timestamp()
         time_interval = round(24 * 60 * 60 / (len(self.selected_posts) * 60)) - 1
 
         for post in self.selected_posts:
-            attachments = [f'photo{photo[0]}_{photo[1]}' for photo in post.photos] + \
-                          [f'video{video[0]}_{video[1]}' for video in post.videos] + \
-                          [f'audio{audio[0]}_{audio[1]}' for audio in post.audios] + \
-                          [f'poll{poll[0]}_{poll[1]}' for poll in post.polls] + \
-                          [f'note{note[0]}_{note[1]}' for note in post.notes] + \
-                          [f'doc{doc[0]}_{doc[1]}' for doc in post.docs]
+            attachments = ([f'photo{photo[0]}_{photo[1]}' for photo in post.photos] +
+                           [f'video{video[0]}_{video[1]}' for video in post.videos] +
+                           [f'audio{audio[0]}_{audio[1]}' for audio in post.audios] +
+                           [f'poll{poll[0]}_{poll[1]}' for poll in post.polls] +
+                           [f'note{note[0]}_{note[1]}' for note in post.notes] +
+                           [f'doc{doc[0]}_{doc[1]}' for doc in post.docs])
             method_name = 'wall.post'
             parameters = {'owner_id': f'-{self.my_group_id}', 'from_group': 1, 'message': post.text,
                           'attachments': ','.join(attachments), 'publish_date': publish_timestamp}
@@ -131,11 +133,11 @@ class Bot:
                               indent=4, ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
 
-        with open(f'..\logs\log_{today}.txt', 'w+', encoding='utf-8') as file:
+        with open(f'..\logs\log_{self.index}_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
 
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
-        with open(f'..\logs\log_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
+        with open(f'..\logs\log_{self.index}_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
             file.write(bad_groups)
 
     def print_main_info(self):
@@ -143,8 +145,8 @@ class Bot:
         Prints main attributes of each selected post, names of bad groups and saves plots
         """
         selected_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
-        create_like_repost_plot(selected_posts)
-
+        create_like_repost_plot(selected_posts, self.index)
+        print(f'Group {self.index}:')
         print(f'Amount of posts: {len(self.top_posts)}, from {len(self.group_ids)} groups.')
         print('Overall rating - Like conv. - Repost conv.')
         for post in selected_posts:

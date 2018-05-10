@@ -13,7 +13,7 @@ class Post:
         self.likes_per_repost = round(self.likes / self.reposts) if self.reposts != 0 else inf
         self.views = views
         self.like_conversion_pct = round((self.likes / self.views) * 100, 5) if self.views != 0 else 0
-        self.repost_conversion_pct = (self.reposts / self.views) * 100 if self.views != 0 else 0
+        self.repost_conversion_pct = round((self.reposts / self.views) * 100, 5) if self.views != 0 else 0
         self.overall_rating = 0
         self.text = text
         self.photos, self.videos, self.audios, self.polls, self.notes, self.docs = [], [], [], [], [], []

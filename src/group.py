@@ -45,11 +45,7 @@ class Group:
         """
         if len(self.yesterday_posts) == 0:
             return None
-        top_repost_posts = sorted(self.yesterday_posts, key=lambda x: x.repost_conversion_pct)
-        top_like_posts = sorted(self.yesterday_posts, key=lambda x: x.like_conversion_pct)
-        for post in self.yesterday_posts:
-            post.overall_rating = top_repost_posts.index(post) + top_like_posts.index(post)
-        top_posts = sorted(self.yesterday_posts, key=lambda x: x.overall_rating, reverse=True)
+        top_posts = sorted(self.yesterday_posts, key=lambda x: x.likes, reverse=True)
         return top_posts[0]
 
     @staticmethod

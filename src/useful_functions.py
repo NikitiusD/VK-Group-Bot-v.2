@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def create_like_repost_plot(posts, index):
+def create_metrics_plot(posts, index):
     """
     Creates useful plots and logs them
     """
@@ -72,7 +72,7 @@ def extract_date(timestamp):
     """
     Converts timestamp to date
     :param timestamp: string timestamp from VK API response
-    :return: date
+    :return: Date
     """
     return date.fromtimestamp(int(timestamp))
 
@@ -88,8 +88,7 @@ def get_tomorrow_timestamp():
 
 def get_yesterday():
     """
-    Gets yesterday date
-    :return: date
+    Gets yesterday Date
+    :return: Date
     """
-    yesterday = date.today() - timedelta(days=1)
-    return yesterday
+    return date.today() - timedelta(days=1)

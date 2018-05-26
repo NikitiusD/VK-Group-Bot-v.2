@@ -1,6 +1,6 @@
 from vk_request import VKRequest as req
 from group import Group
-from useful_functions import get_tomorrow_timestamp, create_like_repost_plot
+from useful_functions import get_tomorrow_timestamp, create_metrics_plot
 from time import sleep
 from datetime import date
 from random import shuffle
@@ -29,42 +29,39 @@ class Bot:
 
     def get_group_ids(self):
         """
-        Gets the group ids from your groups link list
+        Gets the Group ids from your Groups link list
         :return: list of ids
         """
         method_name = 'groups.getById'
         parameters = {'group_id': self.my_group_id, 'fields': 'links'}
         response = req().get(method_name, parameters)
         short_names = [group_info['url'].split('/')[3] for group_info in response['response'][0]['links']]
-        ids = Group.get_ids_from_urls(short_names)
-        return ids
+        return Group.get_ids_from_urls(short_names)
 
     def get_group_names(self):
         """
-        Gets names of all groups
+        Gets names of all Groups
         :return: list of names
         """
         method_name = 'groups.getById'
         parameters = {'group_ids': ','.join([str(id) for id in self.group_ids])}
         response = req().get(method_name, parameters)
-        names = [group_info['name'] for group_info in response['response']]
-        return names
+        return [group_info['name'] for group_info in response['response']]
 
     def get_members_count(self):
         """
-        Gets the number of subscribers of groups by their ids
-        :return: list with the number of subscribers of groups
+        Gets the number of subscribers of Groups by their ids
+        :return: list with the number of subscribers of Groups
         """
         method_name = 'groups.getById'
         parameters = {'group_ids': ','.join([str(id) for id in self.group_ids]), 'fields': 'members_count'}
         response = req().get(method_name, parameters)
-        members_count = [group_info['members_count'] for group_info in response['response']]
-        return members_count
+        return [group_info['members_count'] for group_info in response['response']]
 
     def get_top_posts(self):
         """
-        Gets the list of top posts, one post from each group and then sort them by its conversion
-        :return: list of top posts
+        Gets the list of top Posts, one post from each Group and then sort them by its conversion
+        :return: list of top Posts
         """
         top_posts = [Group(id, name, members_count).top_post
                      for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
@@ -79,13 +76,12 @@ class Bot:
         for post in top_posts:
             post.overall_rating = top_repost_posts.index(post) + top_like_posts.index(post)
 
-        top_posts = sorted(top_posts, key=lambda x: x.overall_rating, reverse=True)
-        return top_posts
+        return sorted(top_posts, key=lambda x: x.overall_rating, reverse=True)
 
     def select_top_posts(self):
         """
-        Selects best posts with some randomization by shuffling them
-        :return: list of posts
+        Selects best Posts with some randomization by shuffling them
+        :return: list of Posts
         """
         if len(self.top_posts) >= self.number_of_posts * self.scatter:
             selected_posts = self.top_posts[:int((self.number_of_posts * self.scatter))]
@@ -100,7 +96,7 @@ class Bot:
 
     def post_in_group(self):
         """
-        Makes deferred posts in your group of selected posts in such a way that they are published after a
+        Makes deferred Posts in your Group of selected Posts in such a way that they are published after a
         certain period, calculated on the basis of their number
         """
         publish_timestamp = get_tomorrow_timestamp()
@@ -123,7 +119,7 @@ class Bot:
 
     def log_posts(self):
         """
-        Logs all posted posts and groups without posts
+        Logs all posted Posts and groups without Posts
         """
         try:
             os.mkdir('..\logs', 777)
@@ -142,10 +138,10 @@ class Bot:
 
     def print_main_info(self):
         """
-        Prints main attributes of each selected post, names of bad groups and saves plots
+        Prints main attributes of each selected Post, names of bad Groups and saves plots
         """
         selected_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
-        create_like_repost_plot(selected_posts, self.index)
+        create_metrics_plot(selected_posts, self.index)
         print(f'Group {self.index}:')
         print(f'Amount of posts: {len(self.top_posts)}, from {len(self.group_ids)} groups.')
         print('Overall rating - Like conv. - Repost conv.')

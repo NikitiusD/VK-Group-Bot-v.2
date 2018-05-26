@@ -15,7 +15,7 @@ class Group:
     def get_all_posts(self):
         """
         Gets information about the last 100 posts of a group and converts them to a list of instances of the Post class
-        :return: list of suitable group posts
+        :return: list of suitable (not ads or reposts) group Posts
         """
         def suitable(post):
             return (post.get('views', 0) != 0 and post.get('copy_history', 0) == 0 and post['marked_as_ads'] == 0 and
@@ -32,16 +32,14 @@ class Group:
     def choose_yesterday_posts(self):
         """
         Selects yesterday's posts from all posts
-        :return: list of yesterday group posts
+        :return: list of yesterday group Posts
         """
-        yesterday = get_yesterday()
-        yesterday_posts = [post for post in self.all_posts if post.date == yesterday]
-        return yesterday_posts
+        return [post for post in self.all_posts if post.date == get_yesterday()]
 
     def choose_top_post(self):
         """
         Chooses the best post
-        :return: post
+        :return: Post
         """
         if len(self.yesterday_posts) == 0:
             return None
@@ -61,5 +59,4 @@ class Group:
                 urls[i] = urls[i][6:]
         parameters = {'group_ids': ','.join(urls)}
         response = req().get(method_name, parameters)
-        ids = [group_info['id'] for group_info in response['response']]
-        return ids
+        return [group_info['id'] for group_info in response['response']]

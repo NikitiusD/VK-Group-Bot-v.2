@@ -129,11 +129,11 @@ class Bot:
                               indent=4, ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
 
-        with open(f'..\logs\log_{self.index}_{today}.txt', 'w+', encoding='utf-8') as file:
+        with open(f'..\logs\log_{self.my_group_id}_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
 
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
-        with open(f'..\logs\log_{self.index}_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
+        with open(f'..\logs\log_{self.my_group_id}_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
             file.write(bad_groups)
 
     def print_main_info(self):
@@ -141,7 +141,7 @@ class Bot:
         Prints main attributes of each selected Post, names of bad Groups and saves plots
         """
         selected_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
-        create_metrics_plot(selected_posts, self.index)
+        create_metrics_plot(selected_posts, self.my_group_id)
         print(f'Group {self.index}:')
         print(f'Amount of posts: {len(self.top_posts)}, from {len(self.group_ids)} groups.')
         print('Overall rating - Like conv. - Repost conv.')

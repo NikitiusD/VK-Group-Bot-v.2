@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def create_metrics_plot(posts, index):
+def create_metrics_plot(posts, id):
     """
     Creates useful plots and logs them
     """
@@ -64,7 +64,7 @@ def create_metrics_plot(posts, index):
     today = date.today().strftime('%Y-%m-%d')
     figure = plt.gcf()
     figure.set_size_inches(16, 9)
-    plt.savefig(f'..\logs\log_{index}_{today}.png', dpi=120)
+    plt.savefig(f'..\logs\log_{id}_{today}.png', dpi=120)
     # plt.show()
 
 

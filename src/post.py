@@ -1,3 +1,4 @@
+import json
 from useful_functions import extract_date
 from math import inf
 
@@ -22,12 +23,12 @@ class Post:
     def __str__(self):
         return ', '.join([f'{attribute}: {self.__dict__[attribute]}'for attribute in list(self.__dict__.keys())])
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return False
 
-    def extract_media(self, attachments):
+    def extract_media(self, attachments: json) -> None:
         """
         Extract media from attachments
         :param attachments: attachments json from VK API's response

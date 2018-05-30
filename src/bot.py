@@ -1,11 +1,13 @@
 from vk_request import VKRequest as req
 from group import Group
+from post import Post
 from useful_functions import get_tomorrow_timestamp, create_metrics_plot
 from time import sleep
 from datetime import date
 from random import shuffle
 import json
 import os
+from typing import List
 
 
 class Bot:
@@ -27,7 +29,7 @@ class Bot:
         self.log_posts()
         self.print_main_info()
 
-    def get_group_ids(self):
+    def get_group_ids(self) -> List[str]:
         """
         Gets the Group ids from your Groups link list
         :return: list of ids
@@ -38,7 +40,7 @@ class Bot:
         short_names = [group_info['url'].split('/')[3] for group_info in response['response'][0]['links']]
         return Group.get_ids_from_urls(short_names)
 
-    def get_group_names(self):
+    def get_group_names(self) -> List[str]:
         """
         Gets names of all Groups
         :return: list of names
@@ -48,7 +50,7 @@ class Bot:
         response = req().get(method_name, parameters)
         return [group_info['name'] for group_info in response['response']]
 
-    def get_members_count(self):
+    def get_members_count(self) -> List[str]:
         """
         Gets the number of subscribers of Groups by their ids
         :return: list with the number of subscribers of Groups
@@ -58,7 +60,7 @@ class Bot:
         response = req().get(method_name, parameters)
         return [group_info['members_count'] for group_info in response['response']]
 
-    def get_top_posts(self):
+    def get_top_posts(self) -> List[Post]:
         """
         Gets the list of top Posts, one post from each Group and then sort them by its conversion
         :return: list of top Posts
@@ -78,7 +80,7 @@ class Bot:
 
         return sorted(top_posts, key=lambda x: x.overall_rating, reverse=True)
 
-    def select_top_posts(self):
+    def select_top_posts(self) -> List[Post]:
         """
         Selects best Posts with some randomization by shuffling them
         :return: list of Posts
@@ -94,7 +96,7 @@ class Bot:
             selected_posts = selected_posts[:self.vk_limit]
         return selected_posts
 
-    def post_in_group(self):
+    def post_in_group(self) -> None:
         """
         Makes deferred Posts in your Group of selected Posts in such a way that they are published after a
         certain period, calculated on the basis of their number
@@ -117,7 +119,7 @@ class Bot:
             publish_timestamp += time_interval * 60
             sleep(0.33)
 
-    def log_posts(self):
+    def log_posts(self) -> None:
         """
         Logs all posted Posts and groups without Posts
         """
@@ -136,7 +138,7 @@ class Bot:
         with open(f'..\logs\log_{self.my_group_id}_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
             file.write(bad_groups)
 
-    def print_main_info(self):
+    def print_main_info(self) -> None:
         """
         Prints main attributes of each selected Post, names of bad Groups and saves plots
         """

@@ -1,6 +1,7 @@
 from vk_request import VKRequest as req
 from post import Post
 from useful_functions import get_yesterday
+from typing import List
 
 
 class Group:
@@ -12,7 +13,7 @@ class Group:
         self.yesterday_posts = self.choose_yesterday_posts()
         self.top_post = self.choose_top_post()
 
-    def get_all_posts(self):
+    def get_all_posts(self) -> List[Post]:
         """
         Gets information about the last 100 posts of a group and converts them to a list of instances of the Post class
         :return: list of suitable (not ads or reposts) group Posts
@@ -29,14 +30,14 @@ class Group:
                  for post in response['response']['items'] if suitable(post)]
         return posts
 
-    def choose_yesterday_posts(self):
+    def choose_yesterday_posts(self) -> List[Post]:
         """
         Selects yesterday's posts from all posts
         :return: list of yesterday group Posts
         """
         return [post for post in self.all_posts if post.date == get_yesterday()]
 
-    def choose_top_post(self):
+    def choose_top_post(self) -> Post or None:
         """
         Chooses the best post
         :return: Post
@@ -47,7 +48,7 @@ class Group:
         return top_posts[0]
 
     @staticmethod
-    def get_ids_from_urls(urls):
+    def get_ids_from_urls(urls: List[str]) -> List[str]:
         """
         Gets ids of groups from it's short names
         :param urls: list of (screen_name)s from VK API aka short names

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def create_metrics_plot(posts, id):
+def create_metrics_plot(posts, id: str) -> None:
     """
     Creates useful plots and logs them
     """
@@ -68,7 +68,7 @@ def create_metrics_plot(posts, id):
     # plt.show()
 
 
-def extract_date(timestamp):
+def extract_date(timestamp: str) -> date:
     """
     Converts timestamp to date
     :param timestamp: string timestamp from VK API response
@@ -77,16 +77,16 @@ def extract_date(timestamp):
     return date.fromtimestamp(int(timestamp))
 
 
-def get_tomorrow_timestamp():
+def get_tomorrow_timestamp() -> float:
     """
     Gets timestamp of tomorrow day at 00:00:00
-    :return: integer timestamp
+    :return: float timestamp
     """
     tomorrow = datetime.today() + timedelta(days=1)
     return datetime(year=tomorrow.year, month=tomorrow.month, day=tomorrow.day).timestamp()
 
 
-def get_yesterday():
+def get_yesterday() -> date:
     """
     Gets yesterday Date
     :return: Date

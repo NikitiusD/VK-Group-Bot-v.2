@@ -86,9 +86,10 @@ class Bot:
         :return: list of Posts
         """
         if len(self.top_posts) >= self.number_of_posts * self.scatter:
-            selected_posts = self.top_posts[:int((self.number_of_posts * self.scatter))]
-        elif len(self.top_posts) >= self.number_of_posts:
-            selected_posts = self.top_posts[:self.number_of_posts]
+            if len(self.top_posts) >= self.number_of_posts:
+                selected_posts = self.top_posts[:self.number_of_posts]
+            else:
+                selected_posts = self.top_posts[:int((self.number_of_posts * self.scatter))]
         else:
             selected_posts = self.top_posts
         shuffle(selected_posts)
@@ -101,8 +102,11 @@ class Bot:
         Makes deferred Posts in your Group of selected Posts in such a way that they are published after a
         certain period, calculated on the basis of their number
         """
-        publish_timestamp = get_tomorrow_timestamp()
-        time_interval = round(24 * 60 * 60 / (len(self.selected_posts) * 60)) - 1
+        sec_in_hour = 60 * 60
+        night_hours = 8
+        hours_for_publishing = 24 - night_hours
+        publish_timestamp = get_tomorrow_timestamp() + night_hours * sec_in_hour
+        time_interval = round(hours_for_publishing * sec_in_hour / (len(self.selected_posts) * 60))
 
         for post in self.selected_posts:
             attachments = ([f'photo{photo[0]}_{photo[1]}' for photo in post.photos] +

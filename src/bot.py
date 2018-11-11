@@ -14,12 +14,16 @@ class Bot:
     vk_limit = json.load(open('..\config.json'))['vk_limit']
     bad_groups = []
 
-    def __init__(self, index, id, number_of_posts, repost_border, scatter):
+    def __init__(self, index, id, number_of_posts, repost_border, scatter, max_posts_per_group,
+                 start_post_hour, end_post_hour):
         self.index = index + 1
         self.my_group_id = id
         self.number_of_posts = number_of_posts
         self.repost_border = repost_border
         self.scatter = scatter
+        self.max_posts_per_group = max_posts_per_group
+        self.start_post_hour = start_post_hour
+        self.end_post_hour = end_post_hour
         self.group_ids = self.get_group_ids()
         self.group_names = self.get_group_names()
         self.members_count = self.get_members_count()
@@ -58,18 +62,25 @@ class Bot:
         method_name = 'groups.getById'
         parameters = {'group_ids': ','.join([str(id) for id in self.group_ids]), 'fields': 'members_count'}
         response = req().get(method_name, parameters)
-        return [group_info['members_count'] for group_info in response['response']]
+        return [group_info['members_count'] for group_info in response['response']
+                if group_info.get('deactivated', '') != 'banned']
 
     def get_top_posts(self) -> List[Post]:
         """
         Gets the list of top Posts, one post from each Group and then sort them by its conversion
         :return: list of top Posts
         """
-        top_posts = [Group(id, name, members_count).top_post
-                     for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
+        list_of_top_posts = [Group(id, name, members_count, self.max_posts_per_group).top_posts
+                             for id, name, members_count in zip(self.group_ids, self.group_names, self.members_count)]
+        top_posts = []
+        for top_posts_of_group in list_of_top_posts:
+            if top_posts_of_group is None:
+                top_posts.append(top_posts_of_group)
+            else:
+                top_posts.extend(top_posts_of_group)
 
-        bad_group_indexes = [index for index, post in enumerate(top_posts) if post is None]
-        self.bad_groups = [(self.group_ids[index], self.group_names[index]) for index, post in enumerate(top_posts)
+        bad_group_indexes = [index for index, post in enumerate(list_of_top_posts) if post is None]
+        self.bad_groups = [(self.group_ids[index], self.group_names[index]) for index, post in enumerate(list_of_top_posts)
                            if index in bad_group_indexes]
         top_posts = [post for post in top_posts if post is not None and post.reposts > self.repost_border]
 
@@ -103,18 +114,18 @@ class Bot:
         certain period, calculated on the basis of their number
         """
         sec_in_hour = 60 * 60
-        night_hours = 8
-        hours_for_publishing = 24 - night_hours
-        publish_timestamp = get_tomorrow_timestamp() + night_hours * sec_in_hour
+        hours_for_publishing = self.end_post_hour - self.start_post_hour
+        publish_timestamp = get_tomorrow_timestamp() + self.start_post_hour * sec_in_hour
         time_interval = round(hours_for_publishing * sec_in_hour / (len(self.selected_posts) * 60))
 
         for post in self.selected_posts:
             attachments = ([f'photo{photo[0]}_{photo[1]}' for photo in post.photos] +
                            [f'video{video[0]}_{video[1]}' for video in post.videos] +
                            [f'audio{audio[0]}_{audio[1]}' for audio in post.audios] +
-                           [f'poll{poll[0]}_{poll[1]}' for poll in post.polls] +
-                           [f'note{note[0]}_{note[1]}' for note in post.notes] +
-                           [f'doc{doc[0]}_{doc[1]}' for doc in post.docs])
+                           [f'doc{doc[0]}_{doc[1]}' for doc in post.docs]
+                           # [f'poll{poll[0]}_{poll[1]}' for poll in post.polls] +
+                           # [f'note{note[0]}_{note[1]}' for note in post.notes] +
+                           )
             method_name = 'wall.post'
             parameters = {'owner_id': f'-{self.my_group_id}', 'from_group': 1, 'message': post.text,
                           'attachments': ','.join(attachments), 'publish_date': publish_timestamp}

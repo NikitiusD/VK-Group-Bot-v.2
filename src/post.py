@@ -16,8 +16,9 @@ class Post:
         self.like_conversion_pct = round((self.likes / self.views) * 100, 5) if self.views != 0 else 0
         self.repost_conversion_pct = round((self.reposts / self.views) * 100, 5) if self.views != 0 else 0
         self.overall_rating = 0
-        self.text = text
-        self.photos, self.videos, self.audios, self.polls, self.notes, self.docs = [], [], [], [], [], []
+        self.text = self.complete_the_text(text)
+        self.photos, self.videos, self.audios, self.docs = [], [], [], []
+        # self.polls, self.notes, = [], []
         self.extract_media(attachments)
 
     def __str__(self):
@@ -27,6 +28,9 @@ class Post:
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return False
+
+    def complete_the_text(self, text: str):
+        return f'{text}\n\nИсточник: {self.group_name}'
 
     def extract_media(self, attachments: json) -> None:
         """
@@ -40,9 +44,9 @@ class Post:
                 self.videos.append((attachment['video']['owner_id'], attachment['video']['id']))
             if attachment['type'] == 'audio':
                 self.audios.append((attachment['audio']['owner_id'], attachment['audio']['id']))
-            if attachment['type'] == 'poll':
-                self.polls.append((attachment['poll']['owner_id'], attachment['poll']['id']))
+            # if attachment['type'] == 'poll':
+            #     self.polls.append((attachment['poll']['owner_id'], attachment['poll']['id']))
             if attachment['type'] == 'doc':
                 self.docs.append((attachment['doc']['owner_id'], attachment['doc']['id']))
-            if attachment['type'] == 'note':
-                self.notes.append((attachment['note']['owner_id'], attachment['note']['id']))
+            # if attachment['type'] == 'note':
+            #     self.notes.append((attachment['note']['owner_id'], attachment['note']['id']))

@@ -5,13 +5,13 @@ from typing import List
 
 
 class Group:
-    def __init__(self, id, name, members_count):
+    def __init__(self, id, name, members_count, max_posts_per_group):
         self.id = id
         self.name = name
         self.members_count = members_count
         self.all_posts = self.get_all_posts()
         self.yesterday_posts = self.choose_yesterday_posts()
-        self.top_post = self.choose_top_post()
+        self.top_posts = self.choose_top_posts(max_posts_per_group)
 
     def get_all_posts(self) -> List[Post]:
         """
@@ -37,15 +37,15 @@ class Group:
         """
         return [post for post in self.all_posts if post.date == get_yesterday()]
 
-    def choose_top_post(self) -> Post or None:
+    def choose_top_posts(self, max_posts_per_group) -> List[Post] or None:
         """
-        Chooses the best post
-        :return: Post
+        Chooses the best posts
+        :return: list of Posts
         """
         if len(self.yesterday_posts) == 0:
             return None
         top_posts = sorted(self.yesterday_posts, key=lambda x: x.likes, reverse=True)
-        return top_posts[0]
+        return top_posts[:max_posts_per_group]
 
     @staticmethod
     def get_ids_from_urls(urls: List[str]) -> List[str]:

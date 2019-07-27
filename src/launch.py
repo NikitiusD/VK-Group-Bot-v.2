@@ -24,7 +24,7 @@ def main():
                 and 0 <= group['start_post_hour'] < group['end_post_hour']
                 and isinstance(group['end_post_hour'], int)
                 and group['end_post_hour'] <= 24):
-            print(f'Wrong data in group {i+1} in config. There must be 4 parameters:'
+            print(f'Wrong data in group {i + 1} in config. There must be 4 parameters:'
                   f'\n\'group_id\' must be string'
                   f'\n\'number_of_posts\' must be integer and less or equal than "vk_limit"'
                   f'\n\'repost_border\' must be integer and not less than 0'

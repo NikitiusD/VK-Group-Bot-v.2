@@ -5,9 +5,18 @@
         {
             "group_id": "158155713",
             "number_of_posts": 25,
-            "repost_border": 5,
+            "repost_border": 7,
             "scatter": 1.4,
-            "max_posts_per_group": 2,
+            "max_posts_per_group": 1,
+            "start_post_hour": 8,
+            "end_post_hour": 24
+        },
+        {
+            "group_id": "174319973",
+            "number_of_posts": 20,
+            "repost_border": 2,
+            "scatter": 1.2,
+            "max_posts_per_group": 4,
             "start_post_hour": 8,
             "end_post_hour": 24
         }

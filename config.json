@@ -7,7 +7,7 @@
             "number_of_posts": 25,
             "repost_border": 7,
             "scatter": 1.4,
-            "max_posts_per_group": 1,
+            "max_posts_per_group": 3,
             "start_post_hour": 8,
             "end_post_hour": 24
         },

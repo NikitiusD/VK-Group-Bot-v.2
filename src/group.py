@@ -25,9 +25,12 @@ class Group:
         method_name = 'wall.get'
         parameters = {'owner_id': f'-{self.id}', 'count': '100', 'offset': '1', 'filter': 'owner'}
         response = req().get(method_name, parameters)
-        posts = [Post(self.id, self.name, self.members_count, post['date'], post['likes']['count'],
-                      post['reposts']['count'], post['views']['count'], post['text'], post.get('attachments', []))
-                 for post in response['response']['items'] if suitable(post)]
+        try:
+            posts = [Post(self.id, self.name, self.members_count, post['date'], post['likes']['count'],
+                        post['reposts']['count'], post['views']['count'], post['text'], post.get('attachments', []))
+                    for post in response['response']['items'] if suitable(post)]
+        except:
+            return []
         return posts
 
     def choose_yesterday_posts(self) -> List[Post]:

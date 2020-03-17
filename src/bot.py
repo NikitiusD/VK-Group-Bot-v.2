@@ -11,7 +11,7 @@ from typing import List
 
 
 class Bot:
-    vk_limit = json.load(open('..\config.json'))['vk_limit']
+    vk_limit = json.load(open('../config.json'))['vk_limit']
     bad_groups = []
 
     def __init__(self, index, id, number_of_posts, repost_border, scatter, max_posts_per_group,
@@ -30,7 +30,7 @@ class Bot:
         self.top_posts = self.get_top_posts()
         self.selected_posts = self.select_top_posts()
         self.post_in_group()
-        self.log_posts()
+        # self.log_posts()
         self.print_main_info()
 
     def get_group_ids(self) -> List[str]:
@@ -139,18 +139,18 @@ class Bot:
         Logs all posted Posts and groups without Posts
         """
         try:
-            os.mkdir('..\logs', 777)
+            os.mkdir('../logs', 777)
         except OSError:
             pass
         json_log = json.dumps([post.__dict__ for post in self.selected_posts],
                               indent=4, ensure_ascii=False, default=str)
         today = date.today().strftime('%Y-%m-%d')
 
-        with open(f'..\logs\log_{self.my_group_id}_{today}.txt', 'w+', encoding='utf-8') as file:
+        with open(f'../logs/log_{self.my_group_id}_{today}.txt', 'w+', encoding='utf-8') as file:
             file.write(json_log)
 
         bad_groups = '\n'.join([f'{group[0]}_{group[1]}' for group in self.bad_groups])
-        with open(f'..\logs\log_{self.my_group_id}_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
+        with open(f'../logs/log_{self.my_group_id}_{today}_bad_groups.txt', 'w+', encoding='utf-8') as file:
             file.write(bad_groups)
 
     def print_main_info(self) -> None:
@@ -158,7 +158,7 @@ class Bot:
         Prints main attributes of each selected Post, names of bad Groups and saves plots
         """
         selected_posts = sorted(self.selected_posts, key=lambda x: x.overall_rating, reverse=True)
-        create_metrics_plot(selected_posts, self.my_group_id)
+        # create_metrics_plot(selected_posts, self.my_group_id)
         print(f'Group {self.index}:')
         print(f'Amount of posts: {len(self.top_posts)}, from {len(self.group_ids)} groups.')
         print('Overall rating - Like conv. - Repost conv.')

@@ -5,9 +5,9 @@ from typing import Dict
 
 class VKRequest:
     def __init__(self):
-        with open('..\\access_token.txt') as file:
+        with open('../access_token.txt') as file:
             self.access_token = file.read()
-        self.version = json.load(open('..\config.json'))['version']
+        self.version = json.load(open('../config.json'))['version']
 
     def get_url(self, method_name: str, parameters: str) -> str:
         """

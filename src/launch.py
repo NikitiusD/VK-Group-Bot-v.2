@@ -6,7 +6,7 @@ def main():
     """
     Reads the config, checks for errors and launches bots for all specified groups
     """
-    config = json.load(open('..\config.json'))
+    config = json.load(open('../config.json'))
     groups = config['groups']
 
     for i, group in enumerate(groups):
